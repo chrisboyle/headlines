@@ -11,5 +11,12 @@
 		"feedparser": "0.16.x",
 		"request": "2.27.x"
 	},
-	"engines": "node 0.10.x"
+	"engines": "node 0.10.x",
+	"devDependencies": {
+		"mocha": "1.14.x",
+		"node-fakeweb": "0.0.x"
+	},
+	"scripts": {
+		"test": "mocha"
+	}
 }
