@@ -1,4 +1,5 @@
 module.exports = {
+	cacheTime: 300000,  // 5 mins
 	debug: true,
 	itemsPerFeed: 10,
 	feeds: {

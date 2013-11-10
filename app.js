@@ -1,5 +1,9 @@
 var headlines = require('./lib/headlines.js'),
-    http      = require('http');
+    config    = require('./config.js'),
+    http      = require('http'),
+    cache     = require('memory-cache');
+
+var KEY = 'headlines';
 
 http.createServer(function(request, response) {
 	if (request.url != '/') {
@@ -8,7 +12,13 @@ http.createServer(function(request, response) {
 		return;
 	}
 
-	headlines.refresh(function(result){  // TODO cache
-		headlines.show(response, result);
-	});
+	var cached = cache.get(KEY);
+	if (cached) {
+		headlines.show(response, cached);
+	} else {
+		headlines.refresh(function(result){
+			headlines.show(response, result);
+			cache.put(KEY, result, config.cacheTime);
+		});
+	}
 }).listen(8080);
