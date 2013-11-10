@@ -17,6 +17,7 @@
 		"node-fakeweb": "0.0.x"
 	},
 	"scripts": {
-		"test": "mocha"
+		"test": "mocha",
+		"start": "node app.js"
 	}
 }
