@@ -4,7 +4,9 @@ var headlines = require('../lib/headlines.js'),
     mocha     = require('mocha'),
     fakeweb   = require('node-fakeweb');
 
-var FAKE_URL = 'http://example.com:80/rss.xml';
+var FAKE_OK_URL     = 'http://example.com:80/rss.xml';
+var BAD_CONTENT_URL = 'http://example.com:80/broken.xml';
+var BAD_NET_URL     = 'http://example.invalid:80/rss.xml';
 
 function makeRSS(n) {
 	var s = '<rss>';
@@ -20,18 +22,31 @@ function makeRSS(n) {
 
 describe('headlines', function () {
 	before(function () {
-		fakeweb.allowNetConnect = false;
-		fakeweb.registerUri({uri: FAKE_URL, body: makeRSS(12)});
+		// Let the example.invalid URL fail realistically
+		fakeweb.allowNetConnect = true;
+		var validRSS = makeRSS(12);
+		fakeweb.registerUri({uri: FAKE_OK_URL, body: validRSS});
+		var invalidRSS = validRSS.substring(0, validRSS.length - 1);
+		fakeweb.registerUri({uri: BAD_CONTENT_URL, body: invalidRSS});
 	});
-	after(function () { fakeweb.allowNetConnect = true });
 
 	it('should parse items from RSS', function () {
-		headlines.getArticles(FAKE_URL, 10, function(out) {
+		headlines.getArticles(FAKE_OK_URL, 10, function(out) {
 			assert(typeof out == 'object');
 			assert.equal(out.length, 10);
 			assert.equal(out[0].title, "Item 1");
 			assert.equal(out[9].title, "Item 10");
 		});
+	});
+
+	it('should handle errors gracefully', function () {
+		function expectUnavailable(out) {
+			assert(typeof out == 'object');
+			assert.equal(out.length, 1);
+			assert.equal(out[0].title, "Feed unavailable");
+		}
+		headlines.getArticles(BAD_NET_URL, 10, expectUnavailable);
+		headlines.getArticles(BAD_CONTENT_URL, 10, expectUnavailable);
 	});
 
 	it('should render items to HTML', function () {
