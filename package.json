@@ -11,7 +11,8 @@
 		"feedparser": "0.16.x",
 		"request": "2.27.x",
 		"memory-cache": "0.0.x",
-		"htmlencode": "0.0.x"
+		"express": "3.4.x",
+		"jade": "0.35.x"
 	},
 	"engines": "node 0.10.x",
 	"devDependencies": {
@@ -20,6 +21,6 @@
 	},
 	"scripts": {
 		"test": "mocha",
-		"start": "node app.js"
+		"start": "node app"
 	}
 }

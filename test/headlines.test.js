@@ -49,12 +49,14 @@ describe('headlines', function () {
 		headlines.getArticles(BAD_CONTENT_URL, 10, expectUnavailable);
 	});
 
-	it('should render items to HTML', function () {
-		var written = '';
+	it('should render items using jade', function () {
+		var called = 0;
+		var calledData;
 		out = {
-			writeHead: function(){},
-			write: function(w) { written += w; },
-			end: function(){}
+			render: function(template, data) {
+				called++;
+				calledData = data;
+			}
 		};
 		result = {
 			'First site': [
@@ -68,14 +70,7 @@ describe('headlines', function () {
 			]
 		};
 		headlines.show(out, result);
-		assert.equal(written, '<html><body>'+
-			'<h1>First site</h1><ul>'+
-			'<li><a href="http://example.com/1">item 1</a></li>'+
-			'<li>item 2</li>'+
-			'<li><a href="http://example.com/3">item 3</a></li>'+
-			'</ul><h1>Second site</h1><ul>'+
-			'<li><a href="http://example.com/4">item 4</a></li>'+
-			'<li><a href="http://example.com/5">item 5</a></li>'+
-			'</ul></body></html>');
+		assert.equal(called, 1);
+		assert.deepEqual(calledData, {feeds:result});
 	});
 });

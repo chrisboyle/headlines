@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	each feed in Object.keys(feeds).sort()
+		h1= feed
+		ul
+			each item in feeds[feed]
+				li
+					- if (typeof item.link == 'undefined')
+						= item.title
+					- else
+						a(href=item.link)= item.title

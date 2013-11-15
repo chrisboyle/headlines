@@ -1,17 +1,23 @@
 var headlines = require('./lib/headlines.js'),
     config    = require('./config.js'),
-    http      = require('http'),
+    express   = require('express'),
+    path      = require('path'),
     cache     = require('memory-cache');
 
 var KEY = 'headlines';
 
-http.createServer(function(request, response) {
-	if (request.url != '/') {
-		response.writeHead(404);
-		response.end();
-		return;
-	}
+var app = express();
+app.set('port', process.env.PORT || 8080);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+app.use(express.logger('dev'));
 
+// development only
+if ('development' == app.get('env')) {
+	app.use(express.errorHandler());
+}
+
+app.get('/', function(request, response) {
 	var cached = cache.get(KEY);
 	if (cached) {
 		headlines.show(response, cached);
@@ -21,4 +27,6 @@ http.createServer(function(request, response) {
 			cache.put(KEY, result, config.cacheTime);
 		});
 	}
-}).listen(8080);
+});
+
+app.listen(8080);
